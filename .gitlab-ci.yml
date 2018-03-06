@@ -1,0 +1,15 @@
+stages:
+  - deploy
+
+build docker image:
+  stage: deploy
+  dependencies: []
+  image: docker
+  script:
+    - IMAGE=$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG/master/latest}
+    - docker build -t $IMAGE .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker push $IMAGE
+  only:
+    - tags@ops/kube-workshop
+    - branches@ops/kube-workshop
