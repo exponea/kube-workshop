@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
       - name: flask-demo
-        image: exponea/flask-demo:4.0
+        image: exponea/flask-demo:1.0
         command: ["python", "runner.py"]
 
 ```
@@ -386,7 +386,7 @@ Modify deployment.yml and add following code uder `spec.template.spec.containter
 
 The same with redis.yml:
 ```
-          readinessProbe:
+          livenessProbe:
             exec:
               command:
               - sh
