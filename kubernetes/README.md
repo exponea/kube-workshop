@@ -1,15 +1,15 @@
 Kubernetes workshop
 ===================
 
-1. Making sure everyone installed minikube and kubectl and its working.
--------------------
+1. Making sure everyone installed `minikube` and `kubectl` and its working.
+---------------------------------------------------------------------------
 
 Goals:
 
  - make sure everyone is ready to start workshop and have all prerequisites
- - explain minikube and kubectl
+ - explain `minikube` and `kubectl`
 
-Bash aliases:
+Bash aliases you can add to your `~/.bash_profile`:
 ```
 # k alias to kubectl
 alias k='kubectl'
@@ -21,7 +21,7 @@ Links:
 
  - installation [https://github.com/kubernetes/minikube/blob/v0.25.0/README.md](https://github.com/kubernetes/minikube/blob/v0.25.0/README.md)
  - minikube download [https://github.com/kubernetes/minikube/releases](https://github.com/kubernetes/minikube/releases)
- - minikube dirivers [https://github.com/kubernetes/minikube/blob/master/docs/drivers.md](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md)
+ - minikube drivers [https://github.com/kubernetes/minikube/blob/master/docs/drivers.md](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md)
 
 2. What is container and what is a pod?
 ---------------------
@@ -33,19 +33,21 @@ Goals:
 Links:
 
  - container or a single image [https://kubernetes.io/docs/concepts/containers/images/](https://kubernetes.io/docs/concepts/containers/images/)
+ - understanding pod https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/#understanding-pods
 
 3. Creating your first deployment.
 -------------------
 
 Goals:
 
- - write a deployment (pod) spec file
+ - write a deployment spec file
  - create and inspect deployment
- - interact with deployment remotely using kubectl
+ - interact with deployment remotely using `kubectl`
 
-deployment.yml
+Create deployment.yml
 
 ```
+---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -75,11 +77,11 @@ Useful commands:
 kubectl explain deployment
 kubectl apply -f demo-deployment.yaml
 kubectl get pods
-kubectl describe < POD>
+kubectl describe pod <POD>
 kubectl logs <POD>
 kubectl exec <POD> -- ps axu
 kubectl delete <POD>
-kubectl port-forward <FLASK-demo> 9090:80  # exposing your pod to your local machine
+kubectl port-forward <POD> 9090:80  # exposing pod to your local machine
 ```
 
 Links:
@@ -93,9 +95,9 @@ Goals:
 
  - create a service
  - use label selectors to expose a pod externally
- - headless service, node port, loadbalancer
+ - headless service, node port and loadbalancer
 
-service.yml
+Create service.yml
 
 ```
 ---
@@ -136,12 +138,13 @@ Links:
 Goals:
 
  - explain why do we need ingress
- - differences between cloud providers and minicube
+ - differences between cloud providers and minikube
  - setup ingress and loadbalancer in minikube
 
-ingress.yml
+Create ingress.yml
 
 ```
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -166,6 +169,10 @@ minikube ip
 
 To simulate dns, add IP from `minikube ip` to /etc/hosts and you can access http://flask.demo from your browser.
 
+```
+echo $(minikube ip) flask.demo | sudo tee -a /etc/hosts
+```
+
 Links:
 
  - [https://kubernetes.io/docs/concepts/services-networking/ingress/](https://kubernetes.io/docs/concepts/services-networking/ingress/)
@@ -176,7 +183,7 @@ Links:
 Goals:
 
  - show rolling update deployment and scaling
- - migrate app to version 2.0
+ - migrate app to version `2.0`
  - mention various deployment strategies
 
 Modify deployment.yml, add following lines under `spec` section:
@@ -189,7 +196,7 @@ Modify deployment.yml, add following lines under `spec` section:
       maxUnavailable: 0
 ```
 
-* deployment is rolled out only if you change .spec.template
+* deployment is rolled out only if you change `spec.template`
 * deployment will stop if it encounter some error, can’t pull image, health check etc.
 
 Useful commands:
@@ -199,15 +206,19 @@ kubectl rollout status deployment/flask-demo
 kubectl scale deployment flask-demo --replicas=5
 ```
 
+Links:
+
+ - [https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment)
+
 7. Config map.
 ---------------
 
 Goals:
 
- - create configmaps to store application configuration data
+ - create ConfigMaps to store application configuration data
  - prepare config for redis we will use in our application
 
-redis.yml
+Create redis.yml
 ```
 ---
 apiVersion: v1
@@ -238,8 +249,8 @@ Links:
 
 Goals:
 
- - create statefulset to provision redis database (stateful application)
- - explain ordinal index, stable network id, stable storage, deploymnt and scaling guarantees
+ - create StatefulSet to provision redis database (stateful application)
+ - explain ordinal index, stable network id, stable storage, deployment and scaling guarantees
 
 Append to redis.yml
 
@@ -310,8 +321,6 @@ spec:
             storage: 100Mi
 ```
 
-
-
 Links:
 
  - stateful sets [https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
@@ -323,12 +332,11 @@ Links:
 Goals:
 
  - explain secrets
- - setup environment variables required in new app release (tag 3.0)
+ - setup environment variables required in new app release
  - use secrets to store env variable with password
+ - migrate app to version `3.0`
 
-Update app version to 3.0.
-
-Setup environment variable in deployment.yml. Add following code under `spec.template.spec.containters`:
+Setup environment variable in deployment.yml. Add following code under `spec.template.spec.containers`:
 
 ```
         env:
@@ -348,12 +356,20 @@ data:
   AUTH: YWRtaW46YWRtaW4=
 ```
 
-Again update deployment.yml and add extra:
+
+Secrets must be Base64 encoded string:
+```
+echo -n admin:admin | base64
+```
+
+Again update deployment.yml and add extra to `spec.template`:
 ```
         envFrom:
         - secretRef:
             name: flask-demo
 ```
+
+Deploy app version `3.0`.
 
 Links:
 
@@ -367,14 +383,9 @@ Goals:
 
  - create pods with readiness and liveness probes
  - troubleshoot failing readiness and liveness probes
- - kubectl explain deployment.spec.template.spec.containers.readinessProbe (what is the difference… http, exec command, tcp socket)
+ - kubectl explain `spec.template.spec.containers.readinessProbe` (what is the difference… http, exec command, tcp socket)
 
-
-Links:
-
- - [https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
-
-Modify deployment.yml and add following code uder `spec.template.spec.containters` section:
+Modify deployment.yml and add following code under `spec.template.spec.containers` section:
 ```
         readinessProbe:
           httpGet:
@@ -396,20 +407,24 @@ The same with redis.yml:
             timeoutSeconds: 5
 ```
 
+Links:
+
+ - [https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
+
 11. Resources.
 ------------
 
 Goals:
 
  - explain resource management
- - setup resource consumption and limits for our deploymnent
+ - setup resource consumption and limits for our deployment
 
 Commands:
 ```
 kubectl explain deployment.spec.template.spec.containers.resources
 ```
 
-Similar to probes, add to deployment.yml under `spec.template.spec.containters` this block:
+Similar to probes, add to `deployment.yml` under `spec.template.spec.containers` this block:
 ```
         resources:
           limits:
@@ -429,16 +444,18 @@ Links:
 
 Goals:
 
- - setup prometheus and grafana
- - deploy new /metrics endpoind for monitoring and setup service monitor
- - show example graph/dashbard
+ - setup Prometheus and Grafana
+ - migrate app to version `4.0`
+ - setup service monitor
+ - show example dashboard and graphs
 
-To setup prometheus with grafana run:
+
+To setup Prometheus with Grafana run this command:
 ```
 kubernetes/prometheus/deploy
 ```
 
-Deploy app version 4.0 with metrics support.
+Deploy app version `4.0` with `/metrics` endpoint for monitoring.
 
 Setup service monitor for app with command:
 ```
@@ -449,10 +466,13 @@ Example Grafana metrics:
 ```
 Requests per second:
   sum(rate(request_count[1m])) by (http_status, method, exported_endpoint)
+
 Memory usage:
   process_resident_memory_bytes{job="flask-demo"}
+
 Cpu usage:
   rate(process_cpu_seconds_total{job="flask-demo"}[3m]) * 100
+
 Open file descriptors:
   process_open_fds{job="flask-demo"}
 ```
