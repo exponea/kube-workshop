@@ -6,7 +6,7 @@ metadata:
   labels:
     app: flask-demo
 spec:
-  replicas: 5
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -23,8 +23,7 @@ spec:
       containers:
       - name: flask-demo
         image: exponea/flask-demo:4.0
-        command: ["python"]
-        args: ["runner.py"]
+        command: ["python", "runner.py"]
         env:
         - name: REDIS_URL
           value: redis://redis:6379/0
