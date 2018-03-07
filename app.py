@@ -6,14 +6,22 @@ import hmac
 from flask import Flask, request, Response
 from flask_redis import FlaskRedis
 from redis.exceptions import RedisError
+from prometheus_client import Counter, generate_latest
 
 HOST_COUNTER = 'host_counts'
+COUNT = Counter('request_count', 'App request count', ['method', 'endpoint', 'http_status'])
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 app.config['REDIS_URL'] = os.environ['REDIS_URL']
 redis_store = FlaskRedis(app)
+
+
+@app.after_request
+def after_request(response):
+    COUNT.labels(request.method, request.endpoint, response.status_code).inc()
+    return response
 
 
 @app.route('/')
@@ -42,3 +50,8 @@ def health_check():
     except RedisError:
         return 'Redis not available', 500
     return 'ok'
+
+
+@app.route('/metrics')
+def metrics():
+    return generate_latest()
