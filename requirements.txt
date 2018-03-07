@@ -1,2 +1,3 @@
 Flask==0.12.2
 git+https://github.com/jonashaag/bjoern.git@d2cfd7be26eba77d42aad683b375892cfedb04d7#egg=bjoern
+Flask-Redis==0.3.0
