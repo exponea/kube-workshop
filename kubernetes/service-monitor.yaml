@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: flask-demo
+  labels:
+    monitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      app: flask-demo
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - port: http
+    interval: 10s
