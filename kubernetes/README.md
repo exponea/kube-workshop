@@ -461,6 +461,7 @@ Use previous knowledge + `deployment.spec.template.spec.initContainers` to make 
 Links:
 
  - [https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
+ - [https://kubernetes.io/docs/concepts/workloads/pods/init-containers/](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 
 ## 12. Prometheus + Grafana.
 
