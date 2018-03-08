@@ -412,7 +412,7 @@ Secrets must be Base64 encoded string:
 echo -n admin:admin | base64
 ```
 
-Again update deployment.yml and add extra to `spec.template`:
+Again update deployment.yml and add extra to `spec.template.spec.containers`:
 ```
         envFrom:
         - secretRef:
