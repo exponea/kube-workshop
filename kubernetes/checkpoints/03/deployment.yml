@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: flask-demo
+  labels:
+    app: flask-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-demo
+  template:
+    metadata:
+      labels:
+        app: flask-demo
+    spec:
+      containers:
+      - name: flask-demo
+        image: exponea/flask-demo:1.0
+        command: ["python", "runner.py"]

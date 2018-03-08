@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: flask-demo
+  labels:
+    app: flask-demo
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: flask-demo
+  template:
+    metadata:
+      labels:
+        app: flask-demo
+    spec:
+      containers:
+      - name: flask-demo
+        image: exponea/flask-demo:4.0
+        command: ["python", "runner.py"]
+        resources:
+          limits:
+            cpu: "1"
+            memory: 128Mi
+          requests:
+            cpu: "50m"
+            memory: 32Mi
+        env:
+        - name: REDIS_URL
+          value: redis://redis:6379/0
+        envFrom:
+        - secretRef:
+            name: flask-demo
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 3

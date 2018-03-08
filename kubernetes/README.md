@@ -1,7 +1,7 @@
 Kubernetes workshop
 ===================
 
-## 1. Making sure everyone installed `minikube` and `kubectl` and its working.
+## 1. Making sure everyone installed `minikube` and `kubectl` and its working
 
 
 Goals:
@@ -34,7 +34,7 @@ Links:
  - container or a single image [https://kubernetes.io/docs/concepts/containers/images/](https://kubernetes.io/docs/concepts/containers/images/)
  - understanding pod https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/#understanding-pods
 
-## 3. Creating your first deployment.
+## 3. Creating your first deployment
 
 Goals:
 
@@ -86,7 +86,7 @@ Links:
 
  - creating a deployment [https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment)
 
-## 4. Service resource.
+## 4. Service resource
 
 Goals:
 
@@ -129,7 +129,7 @@ Links:
 
  - defining a service [https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service](https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service)
 
-## 5. Ingress.
+## 5. Ingress
 
 Goals:
 
@@ -173,7 +173,7 @@ Links:
 
  - [https://kubernetes.io/docs/concepts/services-networking/ingress/](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
-## 6. Resources.
+## 6. Resources
 
 Goals:
 
@@ -200,7 +200,7 @@ Links:
 
  - [https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/)
 
-## 7. Rolling update, scaling.
+## 7. Rolling update, scaling
 
 Goals:
 
@@ -243,7 +243,7 @@ Links:
  - [https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment)
  - [https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
 
-## 8. Config map.
+## 8. Config map
 
 Goals:
 
@@ -282,7 +282,7 @@ Links:
  - [https://kubernetes.io/docs/concepts/storage/volumes/#emptydir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
  - creating volume [https://kubernetes.io/docs/concepts/storage/volumes/#hostpath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath)
 
-## 9. Stateful set.
+## 9. Stateful set
 
 Goals:
 
@@ -368,7 +368,7 @@ Links:
  - persistent volumes [https://kubernetes.io/docs/concepts/storage/persistent-volumes/](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
  - running job [https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#running-an-example-job](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#running-an-example-job)
 
-## 10. Managing app configuration and secret.
+## 10. Managing app configuration and secret
 
 Goals:
 
@@ -422,7 +422,7 @@ Links:
  - secrets [https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets](https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets)
  - creating cron job [https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#creating-a-cron-job](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#creating-a-cron-job)
 
-## 11. Monitoring and Health Checks.
+## 11. Monitoring and Health Checks
 
 Goals:
 
@@ -463,7 +463,7 @@ Links:
  - [https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
  - [https://kubernetes.io/docs/concepts/workloads/pods/init-containers/](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 
-## 12. Prometheus + Grafana.
+## 12. Prometheus + Grafana
 
 Goals:
 
@@ -500,6 +500,6 @@ Open file descriptors:
   process_open_fds{job="flask-demo"}
 ```
 
-## 13. Kubernetes dashboard.
+## 13. Kubernetes dashboard
 
 Run `minikube dashboard`.
