@@ -80,7 +80,7 @@ kubectl get pods
 kubectl describe pod <POD>
 kubectl logs <POD>
 kubectl exec <POD> -- ps axu
-kubectl delete <POD>
+kubectl delete pod <POD>
 kubectl port-forward <POD> 9090:80  # exposing pod to your local machine
 ```
 
@@ -177,7 +177,35 @@ Links:
 
  - [https://kubernetes.io/docs/concepts/services-networking/ingress/](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
-6. Rolling update, scaling.
+6. Resources.
+------------
+
+Goals:
+
+ - explain resource management
+ - setup resource consumption and limits for our deployment
+
+Commands:
+```
+kubectl explain deployment.spec.template.spec.containers.resources
+```
+
+Similar to probes, add to `deployment.yml` under `spec.template.spec.containers` this block:
+```
+        resources:
+          limits:
+            cpu: "1"
+            memory: 128Mi
+          requests:
+            cpu: "50m"
+            memory: 32Mi
+```
+
+Links:
+
+ - [https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/)
+
+7. Rolling update, scaling.
 --------------------------
 
 Goals:
@@ -206,12 +234,23 @@ kubectl rollout status deployment/flask-demo
 kubectl scale deployment flask-demo --replicas=5
 ```
 
+Extra:
+
+Try how horizontal pod autoscaler works using:
+```
+minikube addons enable heapster  # enable heapster metrics
+kubectl autoscale deployment <DEPLOYMENT> --cpu-percent=50 --min=1 --max=10
+kubectl get hpa
+```
+and create high load on flask-demo container.
+
 Links:
 
  - [https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment)
+ - [https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
 
-7. Config map.
----------------
+8. Config map.
+--------------
 
 Goals:
 
@@ -240,11 +279,17 @@ kubectl explain configmap
 kubectl create configmap redis-conf --from-file redis.conf  # create directly from file
 ```
 
+Extra:
+
+Add `hostPath` volume `/data` to our deployment.
+
 Links:
 
  - [https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#create-a-configmap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#create-a-configmap)
+ - [https://kubernetes.io/docs/concepts/storage/volumes/#emptydir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
+ - creating volume [https://kubernetes.io/docs/concepts/storage/volumes/#hostpath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath)
 
-8. Stateful set.
+9. Stateful set.
 ----------------
 
 Goals:
@@ -321,13 +366,18 @@ spec:
             storage: 100Mi
 ```
 
+Extra:
+
+Create Job resource that will create some file inside `/data` volume.
+
 Links:
 
  - stateful sets [https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
  - persistent volumes [https://kubernetes.io/docs/concepts/storage/persistent-volumes/](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+ - running job [https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#running-an-example-job](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#running-an-example-job)
 
-9. Managing app configuration and secret.
----------------------------------------
+10. Managing app configuration and secret.
+------------------------------------------
 
 Goals:
 
@@ -371,13 +421,18 @@ Again update deployment.yml and add extra to `spec.template`:
 
 Deploy app version `3.0`.
 
+Extra:
+
+Create CronJob resource that will write current date to some file inside `/data` volume every minute.
+
 Links:
 
  - environment variables [https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container)
  - secrets [https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets](https://kubernetes.io/docs/concepts/configuration/secret/#creating-your-own-secrets)
+ - creating cron job [https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#creating-a-cron-job](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#creating-a-cron-job)
 
-10. Monitoring and Health Checks.
---------------------------------
+11. Monitoring and Health Checks.
+---------------------------------
 
 Goals:
 
@@ -407,37 +462,15 @@ The same with redis.yml:
             timeoutSeconds: 5
 ```
 
+Extra:
+
+It is your responsibility to know your application and write sensible endpoints for liveness and readiness probe, but sometimes you are not a developer of the application and you know that it should not run before something else is running... like Redis.
+
+Use previous knowledge + `deployment.spec.template.spec.initContainers` to make sure Redis is running before our deployment can be started.
+
 Links:
 
  - [https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
-
-11. Resources.
-------------
-
-Goals:
-
- - explain resource management
- - setup resource consumption and limits for our deployment
-
-Commands:
-```
-kubectl explain deployment.spec.template.spec.containers.resources
-```
-
-Similar to probes, add to `deployment.yml` under `spec.template.spec.containers` this block:
-```
-        resources:
-          limits:
-            cpu: "1"
-            memory: 128Mi
-          requests:
-            cpu: "50m"
-            memory: 32Mi
-```
-
-Links:
-
- - [https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/)
 
 12. Prometheus + Grafana.
 ------------------------
