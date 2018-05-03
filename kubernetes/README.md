@@ -35,6 +35,7 @@ Expected output:
 
 Links:
 
+ - https://cloud.google.com/sdk/downloads#linux
  - https://kubernetes.io/docs/tasks/tools/install-kubectl/
  - installation [https://github.com/kubernetes/minikube/blob/v0.25.0/README.md](https://github.com/kubernetes/minikube/blob/v0.25.0/README.md)
  - minikube download [https://github.com/kubernetes/minikube/releases](https://github.com/kubernetes/minikube/releases)
