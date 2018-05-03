@@ -3,10 +3,6 @@ kind: Ingress
 metadata:
   name: flask-demo
 spec:
-  rules:
-  - host: flask.demo
-    http:
-      paths:
-      - backend:
-          serviceName: flask-demo
-          servicePort: 80
+  backend:
+    serviceName: flask-demo
+    servicePort: 80

@@ -11,8 +11,7 @@ spec:
     matchLabels:
       app: flask-demo
   namespaceSelector:
-    matchNames:
-    - default
+    any: true
   endpoints:
   - port: http
     interval: 10s

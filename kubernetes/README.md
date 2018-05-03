@@ -17,6 +17,17 @@ alias k='kubectl'
 source <(kubectl completion bash | sed 's/kubectl/k/g')
 ```
 
+Google kubernetes engine alternative:
+
+Go to http://vetrak.eu/gcp.txt enter username/password.
+Download this file and replace <YOUR_NICKNAME> with your nickname.
+Set environment variable `export KUBECONFIG=<path.to.gcp.txt>`
+Run command `kubectl create ns <YOUR_NICKNAME>`.
+Run `kubectl config get-contexts` to verify your setup.
+Expected output:
+   CURRENT   NAME      CLUSTER                                                 AUTHINFO                                                NAMESPACE
+   *         mvetrak   gke_kube-workshop-203011_europe-west1-c_kube-workshop   gke_kube-workshop-203011_europe-west1-c_kube-workshop   mvetrak
+
 Links:
 
  - installation [https://github.com/kubernetes/minikube/blob/v0.25.0/README.md](https://github.com/kubernetes/minikube/blob/v0.25.0/README.md)
@@ -111,6 +122,7 @@ spec:
     targetPort: 80
   selector:
     app: flask-demo
+  type: NodePort  # add this only if you are using GKE cluster
 ```
 
 Useful commands:
@@ -146,13 +158,9 @@ kind: Ingress
 metadata:
   name: flask-demo
 spec:
-  rules:
-  - host: flask.demo
-    http:
-      paths:
-      - backend:
-          serviceName: flask-demo
-          servicePort: 80
+  backend:
+    serviceName: flask-demo
+    servicePort: 80
 ```
 
 Useful commands:
