@@ -471,6 +471,9 @@ Goals:
  - show example dashboard and graphs
 
 
+Setup auth:
+kubectl create clusterrolebinding <USER>-cluster-admin-binding --clusterrole=cluster-admin --user=<USER>@mail.com
+
 To setup Prometheus with Grafana run this command:
 ```
 kubernetes/prometheus/deploy
