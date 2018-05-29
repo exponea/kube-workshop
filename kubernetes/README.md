@@ -1,7 +1,7 @@
 Kubernetes workshop
 ===================
 
-## 1. Making sure everyone installed `minikube` and `kubectl` and its working
+## 1. Making sure everyone is ready and `kubectl` is working
 
 
 Goals:
