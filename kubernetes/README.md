@@ -17,25 +17,8 @@ alias k='kubectl'
 source <(kubectl completion bash | sed 's/kubectl/k/g')
 ```
 
-Google kubernetes engine alternative:
-
-Go to http://vetrak.eu/gcp.txt enter username/password.
-
-Download this file and replace <YOUR_NICKNAME> with your nickname.
-
-Set environment variable `export KUBECONFIG=<path.to.gcp.txt>`.
-
-Run command `kubectl create ns <YOUR_NICKNAME>`.
-
-Run `kubectl config get-contexts` to verify your setup.
-
-Expected output:
-   CURRENT   NAME      CLUSTER                                                 AUTHINFO                                                NAMESPACE
-   *         mvetrak   gke_kube-workshop-203011_europe-west1-c_kube-workshop   gke_kube-workshop-203011_europe-west1-c_kube-workshop   mvetrak
-
 Links:
 
- - https://cloud.google.com/sdk/downloads#linux
  - https://kubernetes.io/docs/tasks/tools/install-kubectl/
  - installation [https://github.com/kubernetes/minikube/blob/v0.25.0/README.md](https://github.com/kubernetes/minikube/blob/v0.25.0/README.md)
  - minikube download [https://github.com/kubernetes/minikube/releases](https://github.com/kubernetes/minikube/releases)
