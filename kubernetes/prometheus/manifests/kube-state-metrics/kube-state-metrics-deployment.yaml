@@ -1,9 +1,15 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: kube-state-metrics
+  namespace: monitoring
+  labels:
+    app: kube-state-metrics
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: kube-state-metrics
   template:
     metadata:
       labels:
@@ -15,66 +21,79 @@ spec:
         runAsUser: 65534
       containers:
       - name: kube-rbac-proxy-main
-        image: quay.io/brancz/kube-rbac-proxy:v0.2.0
+        image: quay.io/coreos/kube-rbac-proxy:v0.4.1
         args:
-        - "--secure-listen-address=:8443"
-        - "--upstream=http://127.0.0.1:8081/"
+        - --logtostderr
+        - --secure-listen-address=:8443
+        - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        - --upstream=http://127.0.0.1:8081/
         ports:
         - name: https-main
           containerPort: 8443
         resources:
-          requests:
-            memory: 20Mi
-            cpu: 10m
           limits:
+            cpu: 1
             memory: 40Mi
-            cpu: 20m
+          requests:
+            cpu: 10m
+            memory: 20Mi
       - name: kube-rbac-proxy-self
-        image: quay.io/brancz/kube-rbac-proxy:v0.2.0
+        image: quay.io/coreos/kube-rbac-proxy:v0.4.1
         args:
-        - "--secure-listen-address=:9443"
-        - "--upstream=http://127.0.0.1:8082/"
+        - --logtostderr
+        - --secure-listen-address=:9443
+        - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        - --upstream=http://127.0.0.1:8082/
         ports:
         - name: https-self
           containerPort: 9443
         resources:
-          requests:
-            memory: 20Mi
-            cpu: 10m
           limits:
+            cpu: 1
             memory: 40Mi
-            cpu: 20m
+          requests:
+            cpu: 10m
+            memory: 20Mi
       - name: kube-state-metrics
-        image: quay.io/coreos/kube-state-metrics:v1.2.0
+        image: quay.io/coreos/kube-state-metrics:v1.7.1
         args:
         - "--host=127.0.0.1"
         - "--port=8081"
         - "--telemetry-host=127.0.0.1"
         - "--telemetry-port=8082"
-      - name: addon-resizer
-        image: gcr.io/google_containers/addon-resizer:1.0
         resources:
           limits:
-            cpu: 100m
-            memory: 30Mi
+            cpu: 1
+            memory: 100Mi
           requests:
             cpu: 100m
+            memory: 30Mi
+      - name: addon-resizer
+        image: gcr.io/google-containers/addon-resizer-amd64:2.1
+        resources:
+          limits:
+            cpu: 1
+            memory: 60Mi
+          requests:
+            cpu: 10m
             memory: 30Mi
         env:
           - name: MY_POD_NAME
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.name
           - name: MY_POD_NAMESPACE
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.namespace
         command:
           - /pod_nanny
           - --container=kube-state-metrics
           - --cpu=100m
-          - --extra-cpu=2m
+          - --extra-cpu=5m
           - --memory=150Mi
-          - --extra-memory=30Mi
-          - --threshold=5
+          - --extra-memory=5Mi
+          - --acceptance-offset=5
           - --deployment=kube-state-metrics

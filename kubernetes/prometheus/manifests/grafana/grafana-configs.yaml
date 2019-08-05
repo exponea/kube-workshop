@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+data:
+  prometheus.yaml: |-
+    {
+      "apiVersion": 1,
+      "datasources": [
+        {
+          "access": "proxy",
+          "basicAuth": false,
+          "name": "prometheus",
+          "type": "prometheus",
+          "url": "http://prometheus-k8s.monitoring.svc:9090"
+        },
+        {
+          "access": "proxy",
+          "basicAuth": false,
+          "name": "alertmanager",
+          "type": "camptocamp-prometheus-alertmanager-datasource",
+          "url": "http://alertmanager-main.monitoring.svc:9093",
+          "jsonData": {
+            "severity_critical": "3",
+            "severity_high": "2",
+            "severity_warning": "1",
+            "severity_info": "0"
+          }
+        },
+      ]
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+data:
+  dashboards.yaml: |-
+    [
+        {
+            "folder": "",
+            "name": "0",
+            "options": {
+                "path": "/grafana-dashboard-definitions/0"
+            },
+            "org_id": 1,
+            "type": "file"
+        }
+    ]

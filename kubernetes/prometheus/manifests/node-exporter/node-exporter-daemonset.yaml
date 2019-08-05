@@ -2,6 +2,8 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: node-exporter
+  labels:
+    app: node-exporter
 spec:
   updateStrategy:
     rollingUpdate:
@@ -20,19 +22,22 @@ spec:
       hostNetwork: true
       hostPID: true
       containers:
-      - image: quay.io/prometheus/node-exporter:v0.15.2
+      - image: quay.io/prometheus/node-exporter:v0.18.1
         args:
-        - "--web.listen-address=127.0.0.1:9101"
-        - "--path.procfs=/host/proc"
-        - "--path.sysfs=/host/sys"
+        - --web.listen-address=127.0.0.1:9100
+        - --path.procfs=/host/proc
+        - --path.sysfs=/host/sys
+        - --path.rootfs=/host/root
+        - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)
+        - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
         name: node-exporter
         resources:
           requests:
             memory: 30Mi
-            cpu: 100m
+            cpu: 10m
           limits:
-            memory: 50Mi
-            cpu: 200m
+            memory: 128Mi
+            cpu: 1
         volumeMounts:
         - name: proc
           readOnly:  true
@@ -40,11 +45,22 @@ spec:
         - name: sys
           readOnly: true
           mountPath: /host/sys
+        - name: root
+          mountPath: /host/root
+          mountPropagation: HostToContainer
+          readOnly: true
       - name: kube-rbac-proxy
-        image: quay.io/brancz/kube-rbac-proxy:v0.2.0
+        image: quay.io/coreos/kube-rbac-proxy:v0.4.1
         args:
-        - "--secure-listen-address=:9100"
-        - "--upstream=http://127.0.0.1:9101/"
+        - --logtostderr
+        - --secure-listen-address=$(IP):9100
+        - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        - --upstream=http://127.0.0.1:9100/
+        env:
+        - name: IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         ports:
         - containerPort: 9100
           hostPort: 9100
@@ -55,7 +71,7 @@ spec:
             cpu: 10m
           limits:
             memory: 40Mi
-            cpu: 20m
+            cpu: 200m
       tolerations:
         - effect: NoSchedule
           operator: Exists
@@ -66,4 +82,6 @@ spec:
       - name: sys
         hostPath:
           path: /sys
-
+      - name: root
+        hostPath:
+          path: /

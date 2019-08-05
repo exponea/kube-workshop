@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -12,11 +13,20 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
+      initContainers:
+      - name: grafana-plugin-installer
+        image: grafana/grafana:6.0.0
+        command: ["grafana-cli", "--pluginsDir", "/data", "plugins", "install", "camptocamp-prometheus-alertmanager-datasource"]
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /data
       containers:
       - name: grafana
-        image: quay.io/coreos/monitoring-grafana:4.6.3-non-root
+        image: grafana/grafana:6.2.2
         env:
         - name: GF_PATHS_DATA
+          value: /data
+        - name: GF_PATHS_PLUGINS
           value: /data
         - name: GF_AUTH_BASIC_ENABLED
           value: "true"
@@ -32,48 +42,40 @@ spec:
             secretKeyRef:
               name: grafana-credentials
               key: password
-        volumeMounts:
-        - name: grafana-storage
-          mountPath: /data
         ports:
-        - name: web
+        - name: http
           containerPort: 3000
         resources:
           requests:
             memory: 100Mi
             cpu: 100m
           limits:
-            memory: 200Mi
-            cpu: 200m
-      - name: grafana-watcher
-        image: quay.io/coreos/grafana-watcher:v0.0.8
-        args:
-          - '--watch-dir=/var/grafana-dashboards-0'
-          - '--grafana-url=http://localhost:3000'
-        env:
-        - name: GRAFANA_USER
-          valueFrom:
-            secretKeyRef:
-              name: grafana-credentials
-              key: user
-        - name: GRAFANA_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: grafana-credentials
-              key: password
-        resources:
-          requests:
-            memory: "16Mi"
-            cpu: "50m"
-          limits:
-            memory: "32Mi"
-            cpu: "100m"
+            memory: 1Gi
+            cpu: 1
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
         volumeMounts:
-        - name: grafana-dashboards-0
-          mountPath: /var/grafana-dashboards-0
+        - name: grafana-storage
+          mountPath: /data
+        - name: grafana-dashboard-definitions-0
+          mountPath: /grafana-dashboard-definitions/0
+        - name: grafana-dashboards
+          mountPath: /etc/grafana/provisioning/dashboards
+          readOnly: false
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+          readOnly: false
       volumes:
       - name: grafana-storage
         emptyDir: {}
-      - name: grafana-dashboards-0
+      - name: grafana-datasources
         configMap:
-          name: grafana-dashboards-0
+          name: grafana-datasources
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
+      - name: grafana-dashboard-definitions-0
+        configMap:
+          name: grafana-dashboard-definitions-0

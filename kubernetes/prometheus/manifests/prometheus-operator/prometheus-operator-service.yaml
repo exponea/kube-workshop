@@ -5,11 +5,10 @@ metadata:
   labels:
     k8s-app: prometheus-operator
 spec:
-  type: ClusterIP
+  clusterIP: None
   ports:
   - name: http
     port: 8080
     targetPort: http
-    protocol: TCP
   selector:
     k8s-app: prometheus-operator
